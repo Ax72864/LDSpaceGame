@@ -111,7 +111,15 @@ function Invoke-AgentRound {
         [string]$MainLog
     )
 
-    Write-Log -Path $MainLog -Message ("Starting Cursor CLI round: {0} {1}" -f $CursorCommand, ($Arguments -join " "))
+    $displayArgs = @($Arguments | ForEach-Object {
+        if ([string]$_ -eq $Arguments[-1]) {
+            "<prompt>"
+        }
+        else {
+            [string]$_
+        }
+    })
+    Write-Log -Path $MainLog -Message ("Starting Cursor CLI round: {0} {1}" -f $CursorCommand, ($displayArgs -join " "))
 
     & $CursorCommand @Arguments 2>&1 | ForEach-Object {
         Add-Content -LiteralPath $MainLog -Value ([string]$_) -Encoding UTF8
@@ -122,6 +130,24 @@ function Invoke-AgentRound {
     }
 
     return [int]$global:LASTEXITCODE
+}
+
+function Test-AgentAuthentication {
+    param(
+        [string]$CursorCommand,
+        [string]$MainLog
+    )
+
+    Write-Log -Path $MainLog -Message "Checking Cursor Agent authentication."
+    & $CursorCommand status 2>&1 | ForEach-Object {
+        Add-Content -LiteralPath $MainLog -Value ([string]$_) -Encoding UTF8
+    }
+
+    if ($null -eq $global:LASTEXITCODE) {
+        return $true
+    }
+
+    return ([int]$global:LASTEXITCODE -eq 0)
 }
 
 $repoRoot = Resolve-RepoRoot -OverrideRoot $WorkspaceRoot
@@ -149,6 +175,17 @@ Update-State -StatePath $statePath -Patch @{
     lastStartedAt = Get-IsoNow
     lastHeartbeatAt = Get-IsoNow
     lastExitCode = $null
+}
+
+if (-not (Test-AgentAuthentication -CursorCommand $cursorCommand -MainLog $mainLog)) {
+    $message = "Cursor Agent authentication required. Run cursor-agent login or set CURSOR_API_KEY, then start Guard again."
+    Write-Log -Path $mainLog -Message $message
+    Update-State -StatePath $statePath -Patch @{
+        desiredState = "disabled"
+        lastExitCode = 1
+        lastCommandResult = $message
+    }
+    throw $message
 }
 
 Write-Log -Path $mainLog -Message ("Main development loop started. PID={0}, Workspace={1}" -f $PID, $repoRoot)

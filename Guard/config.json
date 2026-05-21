@@ -1,7 +1,6 @@
 {
-  "cursorCommand": "cursor",
+  "cursorCommand": "C:\\Users\\ylswd\\AppData\\Local\\cursor-agent\\cursor-agent.cmd",
   "mainAgentArgs": [
-    "agent",
     "--workspace",
     "{workspace}",
     "--trust",
@@ -10,7 +9,6 @@
     "{prompt}"
   ],
   "delegateAgentArgs": [
-    "agent",
     "--workspace",
     "{workspace}",
     "--trust",

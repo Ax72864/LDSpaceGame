@@ -101,18 +101,26 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\Guard\start-game-dev.ps1
 默认配置位于 `Guard/config.json`：
 
 ```json
-"cursorCommand": "cursor",
-"mainAgentArgs": ["agent", "--workspace", "{workspace}", "--trust", "-p", "--force", "{prompt}"]
+"cursorCommand": "C:\\Users\\ylswd\\AppData\\Local\\cursor-agent\\cursor-agent.cmd",
+"mainAgentArgs": ["--workspace", "{workspace}", "--trust", "-p", "--force", "{prompt}"]
 ```
 
-如果当前机器安装了独立 `agent` 命令，可以将配置改为：
+如果当前机器已经将 Cursor Agent CLI 加入 PATH，可以将配置改为：
 
 ```json
-"cursorCommand": "agent",
+"cursorCommand": "cursor-agent",
 "mainAgentArgs": ["--workspace", "{workspace}", "--trust", "-p", "--force", "{prompt}"]
 ```
 
 `{workspace}` 会被替换为项目根目录，`{prompt}` 会被替换为 `Guard/main-prompt.md` 的内容。
+
+首次运行前需要确保 Cursor Agent CLI 已认证：
+
+```powershell
+& "$env:LOCALAPPDATA\cursor-agent\cursor-agent.cmd" login
+```
+
+如果使用 API Key，也可以设置 `CURSOR_API_KEY` 环境变量。未认证时，启动脚本会写入日志并进入 `disabled` 状态，避免守护脚本反复重启。
 
 ## 安全边界
 
