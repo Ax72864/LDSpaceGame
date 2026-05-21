@@ -1,0 +1,14 @@
+{
+  "desiredState": "running",
+  "mainPid": null,
+  "activeAgentPid": null,
+  "daemonPid": null,
+  "lastStartedAt": null,
+  "lastHeartbeatAt": null,
+  "lastExitCode": null,
+  "restartCount": 0,
+  "lastCommand": null,
+  "lastCommandResult": null,
+  "lastGitSyncAt": null,
+  "updatedAt": null
+}

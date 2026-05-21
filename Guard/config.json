@@ -1,0 +1,39 @@
+{
+  "cursorCommand": "cursor",
+  "mainAgentArgs": [
+    "agent",
+    "--workspace",
+    "{workspace}",
+    "--trust",
+    "-p",
+    "--force",
+    "{prompt}"
+  ],
+  "delegateAgentArgs": [
+    "agent",
+    "--workspace",
+    "{workspace}",
+    "--trust",
+    "-p",
+    "--force",
+    "{prompt}"
+  ],
+  "mainLoopDelaySeconds": 15,
+  "daemonPollSeconds": 30,
+  "gitSyncSeconds": 300,
+  "restartDelaySeconds": 10,
+  "stopTimeoutSeconds": 30,
+  "autoCommitGuardStatus": true,
+  "logs": {
+    "daemon": "Guard/logs/daemon.log",
+    "main": "Guard/logs/main.log"
+  },
+  "files": {
+    "pid": "Guard/main.pid",
+    "state": "Guard/state.json",
+    "cmd": "Guard/cmd.txt",
+    "history": "Guard/history.log",
+    "commands": "Guard/commands.json",
+    "mainPrompt": "Guard/main-prompt.md"
+  }
+}
