@@ -1,14 +1,14 @@
 ﻿{
     "desiredState":  "running",
-    "lastHeartbeatAt":  null,
-    "lastGitSyncAt":  null,
-    "restartCount":  1,
-    "lastStartedAt":  "2026-05-21T20:52:25.6663647Z",
-    "lastCommandResult":  null,
-    "updatedAt":  "2026-05-21T20:52:25.6673655Z",
+    "lastHeartbeatAt":  "2026-05-21T20:53:32.8104586Z",
+    "lastGitSyncAt":  "2026-05-21T20:52:33.6674633Z",
+    "restartCount":  2,
+    "lastStartedAt":  "2026-05-21T20:58:59.9892438Z",
+    "lastCommandResult":  "git sync exit=0",
+    "updatedAt":  "2026-05-21T20:58:59.9902444Z",
     "lastCommand":  null,
     "activeAgentPid":  null,
-    "mainPid":  44232,
-    "daemonPid":  87944,
-    "lastExitCode":  null
+    "mainPid":  71448,
+    "daemonPid":  70796,
+    "lastExitCode":  0
 }
