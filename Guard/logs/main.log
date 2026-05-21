@@ -189,3 +189,38 @@ Warning: 'p' is not in the list of known options, but still passed to Electron/C
 鉁?Logged in as yanglinsen@tuyoogame.com
 [2026-05-21T20:59:02.1586688Z] Main development loop started. PID=71448, Workspace=D:\work\spacegame\LDSpaceGame
 [2026-05-21T20:59:02.2040705Z] Starting Cursor CLI round: C:\Users\ylswd\AppData\Local\cursor-agent\cursor-agent.cmd --workspace D:\work\spacegame\LDSpaceGame --trust -p --force <prompt>
+# 鍒朵綔浜烘寔缁紑鍙?路 绗?1 杞眹鎶?
+## 鏈疆鍒ゆ柇
+
+- **`42.md`**锛氱┖锛屾棤鐢ㄦ埛鏂板弽棣堬紱鏂瑰悜浠?`Docs/娓告垙鎯虫硶.txt` 涓庡埗浣滀汉璇勫涓哄噯銆?- **浠撳簱鐜扮姸**锛氭鍓嶄粎鏈?Guard/鍗忎綔鏂囨。锛?*鏃犳父鎴忎唬鐮?*锛涙湰杞粠闆跺惎鍔?HTML5 鍘熷瀷銆?- **鑼冨洿绛栫暐**锛氬埗浣滀汉鐩爣 v0.1 闇€璇佹槑銆屽竷灞€褰卞搷绉诲姩涓庣敓瀛樸€嶏紱PM 鎷嗕负 **闃舵 A锛堥鏋讹級鈫?闃舵 B锛堥噰鐭?鏁岃锛?*锛岄伩鍏嶄竴娆℃€у爢鍏ㄧ郴缁熴€?
+## 鏈疆瀹屾垚
+
+| 鎴愬憳 | 浜у嚭 |
+|------|------|
+| `/space-game-producer` | v0.1 鎰挎櫙銆侀闄┿€佸彂甯冩爣鍑?|
+| `/game-project-manager` | `Workspaces/game-project-manager/task-board.md` |
+| `/game-system-designer` | `Docs/v0.1-core-loop.md` |
+| `/game-prototype-developer` | `Game/` 闃舵 A 鍙帺鍘熷瀷 |
+
+**闃舵 A 宸插彲鐜╋細**
+
+- 鏍稿績 + 浠绘剰姝ｄ氦閭绘牸鎵╁睍妗嗘灦锛堥噾灞?100锛屾瘡妗?5锛?- 鐐瑰嚮绌哄湴绉诲姩鏁寸珯
+- 鍥哄畾鐩爣鐐癸紙鍙充晶 400,0锛夛紝**鈮? 妗嗘灦涓旇窛鐩爣 <80** 鏄剧ず銆岄樁娈?A 瀹屾垚銆?- HUD锛氶噾灞炪€佺數鍔涖€佹鏋舵暟銆佺洰鏍囪窛绂汇€佹搷浣滄彁绀?
+**鏈湴杩愯锛?*
+
+```powershell
+npx serve Game
+```
+
+娴忚鍣ㄦ墦寮€鎻愮ず鐨勫湴鍧€锛涗篃鍙洿鎺ユ墦寮€ `Game/index.html`锛堥儴鍒嗙幆澧冮渶鏈湴鏈嶅姟鍣級銆?
+## 宸茬煡宸窛 / 椋庨櫓
+
+1. **鎶€鏈爤**锛氳璁″啓 WebGL锛屽綋鍓嶄负 **Canvas 2D**锛涢樁娈?A 鍙帴鍙楋紝闃舵 B 鍓嶅彲璇勪及鏄惁鍒?WebGL銆?2. **鏁板€?*锛氬師鍨嬫鏋舵垚鏈?5锛岃璁℃枃妗ｄ负 10锛涢樁娈?B 鍓嶇敱鏁板€肩瓥鍒掔粺涓€銆?3. **鍒朵綔浜?v0.1 瀹屾暣鐗?*锛堥噰鐭裤€佺偖濉斻€佹晫琚級灏氭湭寮€濮?鈫?**闃舵 B锛圙AME-004锛?*銆?4. 鏈彁浜?Git锛堟寜瑙勫垯鏈富鍔?commit锛夛紱Guard 鏃ュ織/PID 浠嶄笉搴旇繘鐗堟湰搴撱€?
+## 涓嬩竴闃舵锛堣嚜涓绘帹杩涳級
+
+1. **`GAME-004`**锛歚/game-prototype-developer` 瀹炵幇闃舵 B 鈥?灏忚鏄熼噰鐭裤€佺偖濉斻€佷竴娉㈡晫浜恒€佽儨璐ョ粨绠椼€?2. **`/game-numerical-designer`**锛氬榻?`Docs/v0.1-core-loop.md` 鍙傛暟琛ㄣ€?3. **`QA-001`**锛歚/game-polish-developer` 鑷祴鍚庯紝鍒朵綔浜轰綋楠岃瘎瀹℃槸鍚︺€屽竷灞€鏈夋剰涔夈€嶃€?4. 閫氳繃鍚?**`REL-001`**锛氭墦 tag `v0.1.0-prototype`锛屽綊妗?`Releases/`銆?
+---
+
+**璇峰湪 `42.md` 鍐欎笅璇曠帺鎰熷彈**锛堝缓閫犳槸鍚﹂『鎵嬨€佺Щ鍔ㄦ槸鍚︽湁澶┖鎰熴€佽繕缂轰粈涔堬級锛屼笅涓€杞細浼樺厛鍚告敹浣犵殑鍙嶉銆傝嫢闇€瑕佹垜鎶婃湰杞敼鍔?**commit 骞?push**锛岀洿鎺ヨ涓€澹板嵆鍙€?
+[2026-05-21T21:04:48.0107716Z] Cursor CLI round finished with exit code 0.
+[2026-05-21T21:05:03.0294652Z] Starting Cursor CLI round: C:\Users\ylswd\AppData\Local\cursor-agent\cursor-agent.cmd --workspace D:\work\spacegame\LDSpaceGame --trust -p --force <prompt>
