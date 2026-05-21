@@ -264,7 +264,7 @@ function Invoke-GitSync {
             & git add Guard | Out-Null
             & git diff --cached --quiet
             if ($LASTEXITCODE -ne 0) {
-                & git commit -m "更新守护脚本状态" 2>&1 | ForEach-Object {
+                & git commit -m "Update Guard status" 2>&1 | ForEach-Object {
                     Write-Log -Path $DaemonLog -Message ([string]$_)
                 }
             }
@@ -320,14 +320,14 @@ function Invoke-DelegateAgent {
     }
 
     $prompt = @"
-你是 LDSpaceGame 项目的守护脚本指令执行 agent。
+You are the Guard command execution agent for the LDSpaceGame project.
 
-Guard/cmd.txt 中出现了一条守护脚本无法直接匹配的指令：
+Guard/cmd.txt contains an instruction that the daemon could not match directly:
 $CommandText
 
-请在项目范围内理解并执行这条指令。必须遵守 .cursor/rules/、Docs/team-collaboration-rules.md 和 Docs/team-member-roster.md。
-禁止执行本机环境危险操作，包括软件安装、系统级配置、权限提升、驱动安装、系统服务修改、删除或覆盖非任务目标文件等，除非用户明确确认。
-执行后请简短输出结果。
+Understand and execute this instruction within the project scope. You must follow .cursor/rules/, Docs/team-collaboration-rules.md, and Docs/team-member-roster.md.
+Do not perform dangerous local-environment operations unless the user explicitly confirmed them. Dangerous operations include software installation, system-level configuration, privilege escalation, driver installation, system service modification, and deleting or overwriting files outside the task scope.
+After execution, return a brief result.
 "@
 
     $args = Resolve-AgentArguments -TemplateArgs $Config.delegateAgentArgs -Workspace $RepoRoot -Prompt $prompt

@@ -162,7 +162,7 @@ try {
         }
 
         $prompt = Get-Content -LiteralPath $promptPath -Raw -Encoding UTF8
-        $prompt = $prompt + "`n`n当前工作区：" + $repoRoot + "`n请执行一轮自主开发推进。"
+        $prompt = $prompt + "`n`nWorkspace: " + $repoRoot + "`nRun one autonomous development iteration."
         $args = Resolve-AgentArguments -TemplateArgs $config.mainAgentArgs -Workspace $repoRoot -Prompt $prompt
 
         Update-State -StatePath $statePath -Patch @{
