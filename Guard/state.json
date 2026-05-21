@@ -1,11 +1,11 @@
 ﻿{
     "desiredState":  "running",
     "lastHeartbeatAt":  "2026-05-21T21:05:03.0271014Z",
-    "lastGitSyncAt":  "2026-05-21T21:19:42.8256389Z",
+    "lastGitSyncAt":  "2026-05-21T21:24:50.9720047Z",
     "restartCount":  2,
     "lastStartedAt":  "2026-05-21T20:59:00.4568437Z",
     "lastCommandResult":  "git sync exit=0",
-    "updatedAt":  "2026-05-21T21:19:42.8276398Z",
+    "updatedAt":  "2026-05-21T21:24:50.9740050Z",
     "lastCommand":  "状态",
     "activeAgentPid":  null,
     "mainPid":  71448,
