@@ -1,1 +1,4 @@
 # Guard daemon log
+[2026-05-21T20:52:15.4774891Z] Guard daemon started. PID=87944, Workspace=D:\work\spacegame\LDSpaceGame
+[2026-05-21T20:52:15.4996634Z] Main script is not running; restarting.
+[2026-05-21T20:52:25.6683660Z] Started main script pid=44232
