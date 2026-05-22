@@ -342,6 +342,42 @@ GAME-004 已交付（`Game/src/main.js`）。下一步：制作人实机体验�
 - 专项审核：`game-system-designer` 与 `game-code-god` 均通过，无阻塞项；确认没有越界修改成本、初始资源、敌人 HP/数量、炮塔参数、敌袭触发、胜败条件或 UI。
 - 制作人终验决定：通过。接受“未人工实机体感确认、早期资源可能偏宽松、敌袭压力略提前”的残留风险，先让更紧凑节奏进入主线；下一轮继续观察资源宽松度、敌袭到达时间和炮塔有效防守窗口。
 
+### REL-002 发布 v0.2.0-prototype（2026-05-23）
+
+- 状态：完成
+- 风险等级：中低风险发布任务
+- 触发判断：同意触发。推进器可建造并影响移动、敌袭第 2 设施预警/第 4 设施触发、重开按钮重复绘制修复、L0/L0.5/L2/L2.5 自动验证闭环、TUNE-050 调整采矿率与敌人速度均已完成并通过验证，已构成 `v0.2.0-prototype` 可玩里程碑。
+- 负责人：
+  - `it-engineer`：执行 `Releases/v0.2.0-prototype/` 静态归档、确认本地可运行。
+  - `game-project-manager`：审核发布范围、清单完整性、验证记录和无关文件排除。
+  - `space-game-producer`：最终批准发布、创建发布提交与 tag，并决定发布后下一阶段方向。
+- 允许修改范围：`Releases/v0.2.0-prototype/`、本看板记录、必要的 Git commit/tag 操作。
+- 禁止修改范围：不修改 `Game/` 玩法代码、数值、敌袭规则、胜败条件或 UI；不修改 `Scripts/` 验证脚本；不修改 `.cursor/`、`Guard/`、既有 `Releases/v0.1.0-prototype/`；不提交 `Guard/logs/daemon.log`、空 `agent`、终端缓存、截图录像临时产物或其它无关文件。
+- 发布产物验收标准：
+  - `Releases/v0.2.0-prototype/` 包含可运行静态网页：`index.html`、`src/main.js`、`src/styles.css`。
+  - `RELEASE_NOTES.md` 包含版本号、tag、源码基线 commit、构建时间、构建平台、主要变更、验证结果、已知问题和后续方向。
+  - 发布说明记录 v0.2 新增内容：推进器建造与移动影响、敌袭预警/触发节奏、重开按钮修复、L0/L0.5/L2/L2.5 自动验证、TUNE-050 采矿率和敌人速度调整。
+  - 发布提交完成后创建 tag：`v0.2.0-prototype`。
+- 验证标准：
+  - 发布说明引用最近通过结果：L0、L0.5、L2、L2.5 均 PASS。
+  - 记录 TUNE-050 后结果：L0 `SUMMARY: PASS (6 checks, 322 ms)`；L2 `SUMMARY: PASS (15 checks, 29825 ms)`；L2.5 `SUMMARY: PASS (23 checks, 115063 ms)`。
+  - IT 本地打开或探测 `Releases/v0.2.0-prototype/index.html`，确认 Canvas 可加载、无明显路径缺失。
+  - 提交前 `git status` 确认只包含发布归档和看板记录，不包含 `Guard/logs/daemon.log` 或空 `agent`。
+- 推荐提交信息：`发布 v0.2.0-prototype`
+- 推荐 tag：`v0.2.0-prototype`
+- 残留风险：v0.2 已有自动化覆盖，但仍缺少人工实机体感确认，尤其是早期资源宽松度、敌袭到达时间和炮塔防守窗口；静态归档需确认相对路径完整；当前自动化依赖 Edge headless、固定视口、Canvas 像素/HUD 指纹，跨浏览器和高 DPR 场景仍未覆盖。
+
+#### 执行结果（2026-05-23）
+
+- `it-engineer` 已创建 `Releases/v0.2.0-prototype/` 静态归档，包含 `index.html`、`src/main.js`、`src/styles.css`、`RELEASE_NOTES.md`。
+- IT 自检：4 个文件齐全；`index.html` 引用的 `./src/main.js`、`./src/styles.css` 均存在；归档网页文件与当前 `Game/` 源文件 SHA256 一致。
+- 主 agent 发布前复核：
+  - L0.5：`SUMMARY: PASS (4 checks, 7546 ms)`；Console 0 errors；Runtime exceptions 0。
+  - 文件完整性检查：4 个发布文件存在，`index.html` 包含 `./src/main.js`、`./src/styles.css` 和 `<canvas`。
+  - ReadLints：无新增问题。
+- PM 审核结论：发布归档和 `RELEASE_NOTES.md` 满足提交要求；提交范围限定为 `Releases/v0.2.0-prototype/` 与本看板记录；必须排除 `Guard/logs/daemon.log`、空 `agent` 和临时产物。
+- 制作人发布决定：批准发布。发布提交后创建 tag `v0.2.0-prototype` 并推送。
+
 ## 历史轮次
 
 串行：ENG-001 → ENG-002 → GAME-001 → GAME-002 + GAME-003 + PHYS-001（阶段 A）
