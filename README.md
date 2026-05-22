@@ -26,7 +26,23 @@ Or directly:
 node Scripts/verify-browser-console.mjs
 ```
 
-Expect output to include the local URL, Edge path, zero console errors, and `SUMMARY: PASS`. This does not replace full interaction checks; after `Game/` changes, also follow [Docs/smoke-checklist.md](Docs/smoke-checklist.md).
+Expect output to include the local URL, Edge path, zero console errors, and `SUMMARY: PASS`.
+
+### Gameplay smoke (L2, automated)
+
+Drives golden-path clicks on `#game` via Edge headless + CDP (no npm install). Covers move, frame/mining build, metal growth, thruster speed (~42→63), raid warning/wave, and restart reset. Does **not** assert full victory/defeat loops in v1.
+
+```powershell
+pwsh -NoProfile -ExecutionPolicy Bypass -File Scripts/verify-gameplay-smoke.ps1
+```
+
+Or directly:
+
+```powershell
+node Scripts/verify-gameplay-smoke.mjs
+```
+
+After `Game/` changes, run L0 → L0.5 → L2 when possible; see [Docs/smoke-checklist.md](Docs/smoke-checklist.md) for manual gaps.
 
 Run locally from PowerShell:
 

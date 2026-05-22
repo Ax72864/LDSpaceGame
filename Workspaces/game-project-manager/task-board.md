@@ -250,6 +250,24 @@ GAME-004 已交付（`Game/src/main.js`）。下一步：制作人实机体验�
 - 反馈来源：PowerShell 静态验证、Edge headless + CDP 自动化输出、PM 提交前只读审核。
 - 残留风险：L0.5 不覆盖移动、建造、采矿、敌袭、胜败、重开等交互；后续 `Game/` 改动仍需按 `Docs/smoke-checklist.md` 执行 L1，重复路径再评估 L2 自动化。
 
+### SMOKE-003 最小 L2 交互冒烟试点（2026-05-23）
+
+- 状态：完成
+- 风险等级：中低风险工具化试点
+- 负责人：`game-tools-developer`
+- 审核：`game-code-god`
+- 目标：新增零 npm 依赖的 L2 交互冒烟脚本，将启动、移动、建造、采矿、推进器提速、敌袭预警/触发和重开复位做成可重复验证基线。
+- 允许范围：`Scripts/verify-gameplay-smoke.mjs`、`Scripts/verify-gameplay-smoke.ps1`、`README.md`、`Docs/smoke-checklist.md`、本看板记录。
+- 禁止范围：不修改 `Game/` 玩法代码、数值、敌袭规则或 UI 规则；不修改发布归档；不引入 npm 依赖、Playwright、构建工具或长期服务；不提交 `Guard/logs/daemon.log`、空 `agent`、截图录像或临时产物。
+- 验证结果：
+  - L0：`SUMMARY: PASS (6 checks, 208 ms)`。
+  - L0.5：`SUMMARY: PASS (4 checks, 4372 ms)`；Console 0 errors；Runtime exceptions 0。
+  - L2：`SUMMARY: PASS (15 checks, 32877 ms)`；覆盖页面加载、Canvas、固定 1280×720 视口、移动目标、框架建造、采矿站建造、采矿 HUD 变化、推进器前后速度采样（43.5 / 64.4 px/s）、第 2 设施预警、第 4 设施敌袭触发、交互后 Console/Runtime、重开复位和重开后 Console/Runtime。
+  - ReadLints：无新增问题。
+- 专项审核：`game-code-god` 审核通过，无阻塞项；已根据建议补充重开后 Console/Runtime 复查，并修正文档中敌袭触发覆盖边界表述。
+- 反馈来源：L0 PowerShell 输出、L0.5 Edge headless + CDP 输出、L2 Edge headless + CDP 自动点击输出、代码审核报告。
+- 残留风险：首版未断言完整胜利结算（敌人全灭）和失败结算（核心 HP 归零）；脚本依赖 1280×720 固定视口、Canvas 像素/HUD 指纹和当前 UI 色彩布局；未覆盖金属不足、电力停电、炮塔开火细节、跨分辨率和高 DPR 场景。
+
 ## 历史轮次
 
 串行：ENG-001 → ENG-002 → GAME-001 → GAME-002 + GAME-003 + PHYS-001（阶段 A）
