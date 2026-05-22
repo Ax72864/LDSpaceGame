@@ -206,6 +206,18 @@ GAME-004 已交付（`Game/src/main.js`）。下一步：制作人实机体验�
 - 验证：`node --check Game/src/main.js` 通过；ReadLints 无新增问题；PM 范围审核通过。
 - 残留风险：未做浏览器人工目测，后续若调整渲染顺序需复查结算态按钮可见性。
 
+### VERIF-001 最小可重复验证闭环（低风险）
+
+- 状态：完成
+- 负责人：`game-tools-developer`
+- 目标：建立后续 `Game/` 改动的最低验证闭环，包含 L0 静态检查和 L1 浏览器人工冒烟清单。
+- 允许修改范围：`Scripts/validate-static.ps1`、`Docs/smoke-checklist.md`、`README.md`、本看板记录。
+- 禁止修改范围：`Game/` 玩法代码、`Releases/`、`Guard/`、系统配置、依赖配置。
+- 验收标准：PowerShell 脚本可一键运行；失败时非 0；README 可找到命令；冒烟清单覆盖 Canvas、控制台、移动、建造、采矿、敌袭、胜败、重开。
+- 验证结果：主 agent 已运行 `pwsh -NoProfile -ExecutionPolicy Bypass -File Scripts/validate-static.ps1`，结果 `SUMMARY: PASS (6 checks)`。
+- 反馈来源：L0 PowerShell 输出、PM 只读范围审核、文档覆盖检查。
+- 残留风险：本轮未实际执行 L1 浏览器冒烟；L0 不覆盖运行时逻辑、CSS 语义和完整交互回归。后续涉及核心玩法、输入、胜败或发布时仍需补 L1，复杂/重复路径升级到 L2 自动化。
+
 ## 历史轮次
 
 串行：ENG-001 → ENG-002 → GAME-001 → GAME-002 + GAME-003 + PHYS-001（阶段 A）

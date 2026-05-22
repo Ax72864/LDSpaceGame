@@ -2,6 +2,16 @@
 
 ## Stage A HTML5 Prototype
 
+### Minimal validation (L0)
+
+From the repo root in PowerShell:
+
+```powershell
+pwsh -NoProfile -ExecutionPolicy Bypass -File Scripts/validate-static.ps1
+```
+
+Expect `SUMMARY: PASS`. For browser smoke steps after code changes, see [Docs/smoke-checklist.md](Docs/smoke-checklist.md).
+
 Run locally from PowerShell:
 
 ```powershell
