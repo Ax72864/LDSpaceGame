@@ -218,6 +218,23 @@ GAME-004 已交付（`Game/src/main.js`）。下一步：制作人实机体验�
 - 反馈来源：L0 PowerShell 输出、PM 只读范围审核、文档覆盖检查。
 - 残留风险：本轮未实际执行 L1 浏览器冒烟；L0 不覆盖运行时逻辑、CSS 语义和完整交互回归。后续涉及核心玩法、输入、胜败或发布时仍需补 L1，复杂/重复路径升级到 L2 自动化。
 
+### SMOKE-001 L0 + HTTP 静态入口冒烟记录（2026-05-23）
+
+- 状态：完成
+- 风险等级：低风险验证记录
+- 负责人：`game-tools-developer`
+- 目标：补一次可追溯的 L0 静态检查与 HTTP 静态入口冒烟反馈，不新增玩法。
+- 允许范围：运行 `Scripts/validate-static.ps1`；短生命周期启动 Python HTTP 服务；检查入口页面和静态资源；记录验证结果。
+- 禁止范围：不修改 `Game/` 玩法代码；不修改发布归档；不提交 `Guard/logs/`、终端缓存、截图录像临时产物或无关文件。
+- 验证结果：
+  - L0：`SUMMARY: PASS (6 checks, 701 ms)`。
+  - HTTP 服务：`python -m http.server 8765 --directory Game` 短生命周期启动，探测后已停止。
+  - HTTP 冒烟：`/`、`/src/main.js`、`/src/styles.css` 均返回 200；入口 HTML 包含 `<canvas`、`./src/main.js` 和 `./src/styles.css` 引用。
+  - 浏览器可用性：本机 Chrome、Edge 可执行文件存在；Edge headless 截屏探测成功，临时截图已清理。
+  - Console / 完整 L1：未完成，未采集 Console 红错，也未执行移动、建造、采矿、敌袭、胜败、重开人工清单。
+- 反馈来源：L0 PowerShell 输出、Python HTTP 探测、Edge headless 截屏可用性探测、工具开发自检报告。
+- 残留风险：静态与 HTTP serving 已验证，运行时交互、Canvas 实际观感和 Console 错误仍未闭环；下一步需人工按 `Docs/smoke-checklist.md` 跑完整 L1，或评估 Playwright 最小试点。
+
 ## 历史轮次
 
 串行：ENG-001 → ENG-002 → GAME-001 → GAME-002 + GAME-003 + PHYS-001（阶段 A）
