@@ -286,6 +286,62 @@ GAME-004 已交付（`Game/src/main.js`）。下一步：制作人实机体验�
 - 反馈来源：L0 PowerShell 输出、L2 Edge headless + CDP 自动点击输出、L2.5 Edge headless + CDP 胜败路径输出、代码审核报告。
 - 残留风险：脚本依赖固定 1280×720、DPR=1、Edge headless + CDP、Canvas 像素/HUD 指纹和当前 UI 布局；等待上限较长，极慢机器可能超时；未覆盖金属不足、电力停电、复杂多波次、跨分辨率和高 DPR 场景。
 
+### TUNE-050 最小节奏调参（高风险）
+
+- 状态：完成
+- 风险等级：高风险
+- 高风险原因：修改核心资源产出与敌人移动速度数值，会影响早期资源节奏、敌袭压力、胜败耗时和自动化验证稳定性。
+- 制作人目标：缩短采矿站后的早期空等，让敌袭压力更快显现，同时保持现有核心循环与胜败可验证。
+- 调参冻结：
+  - `MINING_RATE`：`5 -> 7`
+  - `ENEMY_SPEED`：`24 -> 28`
+  - `Scripts/verify-gameplay-smoke.mjs` 的 `MINING_WAIT_MS` 同步下调，初始试点 `22_000 -> 16_000`
+  - `Scripts/verify-outcome-smoke.mjs` 的 `MINING_WAIT_MS` 同步下调，初始试点 `24_000 -> 18_000`
+
+#### 高风险流程
+
+1. 制作人确认方向与取舍：已确认，优先缩短早期空等并让敌袭压力更快显现。
+2. PM 拆分任务、范围边界和验收口径：当前记录。
+3. `game-prototype-developer` 执行最小数值与验证等待时间调整。
+4. `game-system-designer` 或 `game-code-god` 专项审核核心节奏影响、禁止范围和验证充分性。
+5. `game-project-manager` 汇总审核修改范围、L0/L2/L2.5 结果、新耗时和残留风险。
+6. 制作人最终体验验收，决定是否提交或继续调参。
+
+#### 任务表
+
+| ID | 标题 | 负责人 | 状态 | 依赖 | 允许修改范围 | 禁止修改范围 | 验收标准 |
+|---|---|---|---|---|---|---|---|
+| PM-050 | 冻结 TUNE-050 高风险流程与验收口径 | `game-project-manager` | 完成 | 制作人方向 | `Workspaces/game-project-manager/task-board.md` | 不改玩法代码、不改脚本、不改发布归档 | 看板记录高风险流程、范围边界、负责人、验收标准、验证计划和风险 |
+| TUNE-050 | 最小节奏数值调整 | `game-prototype-developer` | 完成 | PM-050 | `Game/src/main.js` 的 `MINING_RATE`、`ENEMY_SPEED`；两个验证脚本的 `MINING_WAIT_MS` | 不改成本、初始资源、敌人 HP/数量、炮塔参数、敌袭触发、胜败条件、UI 和发布归档 | `MINING_RATE = 7`、`ENEMY_SPEED = 28`；L2/L2.5 固定采矿等待时间同步缩短；L0/L2/L2.5 均通过；记录新耗时；ReadLints 无新增 |
+| REVIEW-050 | 核心节奏专项审核 | `game-system-designer` + `game-code-god` | 完成 | TUNE-050 | 只读审核 `Game/src/main.js` 与两个验证脚本 | 不直接修代码、不扩大调参范围 | 确认只改冻结数值与等待时间；敌袭触发规则、成本、胜败、炮塔和敌人数量未被改动；验证结果足以支撑验收 |
+| PM-051 | PM 汇总审核与终验建议 | `game-project-manager` | 完成 | REVIEW-050 | 看板记录、范围检查、验证汇总 | 不改玩法代码、不改发布归档 | 汇总执行范围、专项审核结论、L0/L2/L2.5 新耗时、ReadLints 结果和残留风险，并提交制作人终验 |
+
+#### 验收标准
+
+- L0 必须通过：`pwsh -NoProfile -ExecutionPolicy Bypass -File Scripts/validate-static.ps1`。
+- L2 黄金路径必须通过：`pwsh -NoProfile -ExecutionPolicy Bypass -File Scripts/verify-gameplay-smoke.ps1`，并记录总耗时与最终 `MINING_WAIT_MS`。
+- L2.5 胜败结算必须通过：`pwsh -NoProfile -ExecutionPolicy Bypass -File Scripts/verify-outcome-smoke.ps1`，并记录总耗时与最终 `MINING_WAIT_MS`。
+- ReadLints 必须无新增问题。
+- 专项审核确认未修改禁止范围。
+
+#### 残留风险
+
+- `MINING_RATE` 提高后，早期资源积累更快，可能让建造节奏偏宽松，需要制作人实机感受是否仍有取舍压力。
+- `ENEMY_SPEED` 提高后，失败路径可能更快，炮塔击杀窗口变窄，L2.5 胜败耗时与像素判定稳定性可能波动。
+- 固定等待时间下调后，脚本在慢机、后台负载高或 Edge 启动慢时可能出现偶发超时。
+- 本轮只做两个核心数值的最小调参，不解决更深层节奏问题，例如资源曲线、敌袭倒计时、敌人编队、炮塔 DPS 或关卡目标距离。
+
+#### 执行结果（2026-05-23）
+
+- `game-prototype-developer` 已完成最小调参：`MINING_RATE 5 -> 7`、`ENEMY_SPEED 24 -> 28`、L2 `MINING_WAIT_MS 22_000 -> 16_000`、L2.5 `MINING_WAIT_MS 24_000 -> 18_000`。
+- 主 agent 复核验证：
+  - L0：`SUMMARY: PASS (6 checks, 322 ms)`。
+  - L2：`SUMMARY: PASS (15 checks, 29825 ms)`；速度采样约 44.2 / 64.1 px/s，敌袭触发与重开正常。
+  - L2.5：`SUMMARY: PASS (23 checks, 115063 ms)`；胜利等待 27044 ms，失败等待 33615 ms，胜败后重开正常。
+  - ReadLints：无新增问题。
+- 专项审核：`game-system-designer` 与 `game-code-god` 均通过，无阻塞项；确认没有越界修改成本、初始资源、敌人 HP/数量、炮塔参数、敌袭触发、胜败条件或 UI。
+- 制作人终验决定：通过。接受“未人工实机体感确认、早期资源可能偏宽松、敌袭压力略提前”的残留风险，先让更紧凑节奏进入主线；下一轮继续观察资源宽松度、敌袭到达时间和炮塔有效防守窗口。
+
 ## 历史轮次
 
 串行：ENG-001 → ENG-002 → GAME-001 → GAME-002 + GAME-003 + PHYS-001（阶段 A）
