@@ -268,6 +268,24 @@ GAME-004 已交付（`Game/src/main.js`）。下一步：制作人实机体验�
 - 反馈来源：L0 PowerShell 输出、L0.5 Edge headless + CDP 输出、L2 Edge headless + CDP 自动点击输出、代码审核报告。
 - 残留风险：首版未断言完整胜利结算（敌人全灭）和失败结算（核心 HP 归零）；脚本依赖 1280×720 固定视口、Canvas 像素/HUD 指纹和当前 UI 色彩布局；未覆盖金属不足、电力停电、炮塔开火细节、跨分辨率和高 DPR 场景。
 
+### SMOKE-004 胜败结算自动验证（2026-05-23）
+
+- 状态：完成
+- 风险等级：中低风险工具化任务
+- 负责人：`game-tools-developer`
+- 审核：`game-code-god`
+- 目标：新增独立零 npm 依赖的 L2.5 Outcome 冒烟脚本，覆盖胜利结算、失败结算和结算后重开可操作；不拉长现有 L2 黄金路径。
+- 允许范围：`Scripts/verify-outcome-smoke.mjs`、`Scripts/verify-outcome-smoke.ps1`、`README.md`、`Docs/smoke-checklist.md`、本看板记录。
+- 禁止范围：不修改 `Game/` 玩法代码、数值、胜败条件、敌人、炮塔、HUD 或 UI 规则；不修改 `Releases/`、`Guard/`、`.cursor/`；不安装依赖；不引入 Playwright；不提交日志、截图录像、空 `agent` 或临时产物。
+- 验证结果：
+  - L0：`SUMMARY: PASS (6 checks, 202 ms)`。
+  - L2：`SUMMARY: PASS (15 checks, 33875 ms)`。
+  - L2.5 Outcome：`SUMMARY: PASS (23 checks, 132989 ms)`；胜利路径检测到敌波生成、绿色结算 overlay（575 px）、敌人清零、胜利后重开可移动且 HUD 复位；失败路径 fresh load 后检测到无炮塔敌波生成、红色结算 overlay（549 px）、暗色遮罩（16380 px）、失败后重开可移动且 HUD 复位；全程 Console/Runtime 无红错。
+  - ReadLints：无新增问题。
+- 专项审核：`game-code-god` 审核通过，无阻塞项；接受“敌波生成像素可能包含炮塔像素但后续 overlay 兜底”的非阻塞风险，并已补充 README 中 L2.5 运行建议。
+- 反馈来源：L0 PowerShell 输出、L2 Edge headless + CDP 自动点击输出、L2.5 Edge headless + CDP 胜败路径输出、代码审核报告。
+- 残留风险：脚本依赖固定 1280×720、DPR=1、Edge headless + CDP、Canvas 像素/HUD 指纹和当前 UI 布局；等待上限较长，极慢机器可能超时；未覆盖金属不足、电力停电、复杂多波次、跨分辨率和高 DPR 场景。
+
 ## 历史轮次
 
 串行：ENG-001 → ENG-002 → GAME-001 → GAME-002 + GAME-003 + PHYS-001（阶段 A）

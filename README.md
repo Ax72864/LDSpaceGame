@@ -42,7 +42,23 @@ Or directly:
 node Scripts/verify-gameplay-smoke.mjs
 ```
 
-After `Game/` changes, run L0 → L0.5 → L2 when possible; see [Docs/smoke-checklist.md](Docs/smoke-checklist.md) for manual gaps.
+After `Game/` changes, run L0 → L0.5 → L2 when possible; also run L2.5 when changes touch victory, defeat, enemy waves, or restart. See [Docs/smoke-checklist.md](Docs/smoke-checklist.md) for manual gaps.
+
+### Outcome smoke (L2.5, automated)
+
+Independent script for victory/defeat settlement and post-outcome restart (does not extend the L2 golden path):
+
+```powershell
+pwsh -NoProfile -ExecutionPolicy Bypass -File Scripts/verify-outcome-smoke.ps1
+```
+
+Or directly:
+
+```powershell
+node Scripts/verify-outcome-smoke.mjs
+```
+
+Covers page load, Console/Runtime cleanliness, victory overlay + restart, fresh-game defeat overlay + restart. Expect `SUMMARY: PASS`.
 
 Run locally from PowerShell:
 

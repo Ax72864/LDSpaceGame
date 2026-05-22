@@ -8,7 +8,8 @@
 
 - 已完成 L0：`pwsh -NoProfile -ExecutionPolicy Bypass -File Scripts/validate-static.ps1` 输出 `SUMMARY: PASS`。
 - 建议再跑 L0.5 Console 自动化：`pwsh -NoProfile -ExecutionPolicy Bypass -File Scripts/verify-browser-console.ps1`（或 `node Scripts/verify-browser-console.mjs`）。脚本会临时启动 Python HTTP 服务与 Edge headless，采集 **Console error / Runtime exception**、页面加载与 `#game` Canvas 是否存在；通过时输出 `SUMMARY: PASS`。**不覆盖**移动、建造、敌袭等交互。
-- 建议再跑 L2 交互自动化：`pwsh -NoProfile -ExecutionPolicy Bypass -File Scripts/verify-gameplay-smoke.ps1`（或 `node Scripts/verify-gameplay-smoke.mjs`）。脚本在 1280×720 视口下通过 CDP 派发 Canvas 点击，并用 Canvas 像素/HUD 指纹验证黄金路径：移动目标、建框架、采矿站、采矿产金属、推进器提速（约 42→63）、第 2 个设施预警、第 4 个设施敌袭、重开重置。**首版不覆盖**完整胜败结算（敌人全灭 / 核心被打爆）；未覆盖项仍可按下方人工步骤补测。
+- 建议再跑 L2 交互自动化：`pwsh -NoProfile -ExecutionPolicy Bypass -File Scripts/verify-gameplay-smoke.ps1`（或 `node Scripts/verify-gameplay-smoke.mjs`）。脚本在 1280×720 视口下通过 CDP 派发 Canvas 点击，并用 Canvas 像素/HUD 指纹验证黄金路径：移动目标、建框架、采矿站、采矿产金属、推进器提速（约 42→63）、第 2 个设施预警、第 4 个设施敌袭、重开重置。**不覆盖**完整胜败结算；胜败见 L2.5。
+- 建议再跑 L2.5 胜败结算自动化：`pwsh -NoProfile -ExecutionPolicy Bypass -File Scripts/verify-outcome-smoke.ps1`（或 `node Scripts/verify-outcome-smoke.mjs`）。独立脚本：胜利路径（采矿+炮塔+推进器+炮塔 → 炮塔清敌 → 绿色结算 → 重开可操作）；失败路径（独立开局、采矿+3 推进器无炮塔 → 核心被毁 → 红色结算 → 重开可操作）。通过时输出 `SUMMARY: PASS`。
 - 本机可用浏览器（Edge / Chrome 等）。
 - 任选一种本地静态服务方式（二选一即可；人工冒烟时使用；L0.5 脚本会自行起服务）。
 
@@ -76,6 +77,7 @@ npx serve Game
 | L0 结果 | PASS / FAIL |
 | L0.5 Console 脚本 | PASS / FAIL / 跳过 |
 | L2 Gameplay 脚本 | PASS / FAIL / 跳过 |
+| L2.5 Outcome 脚本 | PASS / FAIL / 跳过 |
 | 服务方式 | python 8080 / npx serve / 其他 |
 | 浏览器 | |
 | 失败步骤编号 | |
@@ -84,17 +86,17 @@ npx serve Game
 
 ## L2 自动化覆盖边界（`verify-gameplay-smoke`）
 
-| 已覆盖 | 未覆盖（首版残留风险） |
-|--------|------------------------|
-| 页面加载、Console/Runtime 无红错 | 完整胜利结算（敌人全灭） |
-| Canvas 存在、1280×720 视口 | 完整失败结算（核心 HP 归零） |
+| 已覆盖 | 未覆盖 |
+|--------|--------|
+| 页面加载、Console/Runtime 无红错 | 完整胜利结算（敌人全灭）→ 见 L2.5 |
+| Canvas 存在、1280×720 视口 | 完整失败结算（核心 HP 归零）→ 见 L2.5 |
 | 点击设置移动目标 | 炮塔自动开火细节、电力不足「停电」分支 |
 | 相邻格建框架、菜单双点放置采矿站 | 金属不足时的 UI 反馈 |
 | 靠近小行星后金属 HUD 变化 | 非 1280×720 分辨率 / 高 DPR 环境 |
 | 推进器前后移动速度采样（~42 / ~63） | 直接读取 `state`（游戏未暴露全局快照） |
 | 第 2 个设施后敌袭 HUD 变化 | |
 | 第 4 个设施后敌袭触发（像素 / HUD 信号验证） | |
-| 点击「重开」后敌袭/预警 HUD 复位 | |
+| 点击「重开」后敌袭/预警 HUD 复位（非胜败 overlay 场景） | |
 
 运行命令：
 
@@ -102,7 +104,25 @@ npx serve Game
 pwsh -NoProfile -ExecutionPolicy Bypass -File Scripts/verify-gameplay-smoke.ps1
 ```
 
+## L2.5 自动化覆盖边界（`verify-outcome-smoke`）
+
+| 已覆盖 | 未覆盖 |
+|--------|--------|
+| 页面加载、Console/Runtime 无红错 | 金属不足时的 UI 反馈 |
+| 胜利路径：采矿+炮塔+推进器+炮塔触发敌袭 | 电力不足「停电」分支 |
+| 炮塔清敌后屏幕中心绿色 overlay / 敌像素辅助检测 | 非 1280×720 分辨率 / 高 DPR 环境 |
+| 胜利后点击「重开」、移动目标与 HUD 复位 | 直接读取 `state`（游戏未暴露全局快照） |
+| 独立开局失败路径：采矿+3 推进器（无炮塔） | 复杂战斗分支（多波次、手动操作） |
+| 核心被毁后屏幕中心红色 overlay 辅助检测 | |
+| 失败后点击「重开」、移动目标与 HUD 复位 | |
+
+运行命令：
+
+```powershell
+pwsh -NoProfile -ExecutionPolicy Bypass -File Scripts/verify-outcome-smoke.ps1
+```
+
 ## 何时需要 L3+
 
-- 需稳定断言胜败结算、复杂战斗分支或跨分辨率回归时，评估 Playwright 等更强自动化（见 development-validation-guide）。
-- 发布前对 `Releases/<version>/` 归档再跑一遍本清单（L0 → L0.5 → L2 → 人工补项）。
+- 需跨分辨率回归、复杂战斗分支或更强 DOM/可访问性断言时，评估 Playwright 等（见 development-validation-guide）。
+- 发布前对 `Releases/<version>/` 归档再跑一遍本清单（L0 → L0.5 → L2 → L2.5 → 人工补项）。
