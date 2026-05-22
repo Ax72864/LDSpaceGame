@@ -191,14 +191,50 @@ function getFrameCount() {
   return count;
 }
 
-function getRaidStatusText(waveStarted = state.waveStarted, facilityCount = state.facilityCount) {
-  if (waveStarted) {
-    return "已触发";
+function getRaidPhaseHudState() {
+  if (state.waveStarted) {
+    return { text: "来袭中", color: "#ff9a6a" };
   }
-  if (facilityCount >= 2) {
-    return "预警中 / 建造第4个设施触发";
+  if (state.facilityCount >= 2) {
+    return { text: "预警中", color: "#ffd36a" };
   }
-  return "建造第2个设施后预警";
+  return { text: "安全期", color: "#86d4ff" };
+}
+
+function getThrusterHudState() {
+  let hasThrusterModule = false;
+  for (const module of state.station.modules.values()) {
+    if (module.type !== "thruster") {
+      continue;
+    }
+    hasThrusterModule = true;
+    if (module.active) {
+      return { text: "生效中", color: "#9ea4ff" };
+    }
+  }
+  if (!hasThrusterModule) {
+    return { text: "未建造", color: "#9aa6b6" };
+  }
+  return { text: "停电", color: "#ffd36a" };
+}
+
+function getHudSuggestionText() {
+  if (state.gameOver === "victory") {
+    return "当前建议: 敌袭清空，点击重开复盘建造顺序。";
+  }
+  if (state.gameOver === "defeat") {
+    return "当前建议: 核心失守，优先补炮塔与电力冗余。";
+  }
+  if (state.stageAComplete && !state.waveStarted) {
+    return "当前建议: 阶段达成，扩建炮塔并准备迎敌。";
+  }
+  if (state.waveStarted) {
+    return "当前建议: 敌袭进行中，保持机动并集火近身敌人。";
+  }
+  if (state.facilityCount >= 2) {
+    return "当前建议: 预警阶段，尽快补齐第4设施前的防御。";
+  }
+  return "当前建议: 先扩到5结构并靠近目标圈，完成阶段A。";
 }
 
 function getObjectiveDistance() {
@@ -679,7 +715,9 @@ function drawHud() {
   const objectiveDistance = getObjectiveDistance();
   const speed = BASE_SPEED * (hasThruster() ? THRUSTER_SPEED_MULTIPLIER : 1);
   const livingEnemies = state.enemies.length;
-  const raidStatus = getRaidStatusText();
+  const raidPhaseState = getRaidPhaseHudState();
+  const thrusterState = getThrusterHudState();
+  const suggestionText = getHudSuggestionText();
 
   ctx.fillStyle = "rgba(2, 8, 18, 0.72)";
   ctx.fillRect(16, 16, 470, 250);
@@ -690,12 +728,20 @@ function drawHud() {
     32,
     44,
   );
+  ctx.fillStyle = "#cde7ff";
   ctx.fillText(`电力: +${state.powerProduced} / -${state.powerUsed}`, 32, 68);
+  ctx.fillStyle = "#d9f3ff";
   ctx.fillText(`核心HP: ${Math.ceil(state.coreHp)} / ${CORE_MAX_HP}`, 32, 92);
-  ctx.fillText(`敌人: ${livingEnemies} / ${ENEMY_COUNT}  敌袭: ${raidStatus}`, 32, 116);
+  ctx.fillStyle = raidPhaseState.color;
+  ctx.fillText(`敌人: ${livingEnemies} / ${ENEMY_COUNT}  敌袭阶段: ${raidPhaseState.text}`, 32, 116);
+  ctx.fillStyle = "#d9f3ff";
   ctx.fillText(`模块: ${moduleCount}  结构: ${frameCount}/5  目标距离: ${objectiveDistance.toFixed(0)}`, 32, 140);
-  ctx.fillText(`速度: ${speed.toFixed(0)} world/s  推进器: ${hasThruster() ? "在线" : "无/停电"}  采矿半径: ${MINING_RADIUS}`, 32, 164);
+  ctx.fillStyle = thrusterState.color;
+  ctx.fillText(`速度: ${speed.toFixed(0)} world/s  推进器: ${thrusterState.text}  采矿半径: ${MINING_RADIUS}`, 32, 164);
+  ctx.fillStyle = "#d9f3ff";
   ctx.fillText("操作: 点击绿色邻格建框架；点击frame开菜单；设施含采矿/炮塔/推进器。", 32, 188);
+  ctx.fillStyle = "#cde7ff";
+  ctx.fillText(suggestionText, 32, 212);
 
   if (state.stageAComplete) {
     ctx.fillStyle = "#5bffb4";

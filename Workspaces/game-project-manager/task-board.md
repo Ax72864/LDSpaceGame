@@ -378,6 +378,33 @@ GAME-004 已交付（`Game/src/main.js`）。下一步：制作人实机体验�
 - PM 审核结论：发布归档和 `RELEASE_NOTES.md` 满足提交要求；提交范围限定为 `Releases/v0.2.0-prototype/` 与本看板记录；必须排除 `Guard/logs/daemon.log`、空 `agent` 和临时产物。
 - 制作人发布决定：批准发布。发布提交后创建 tag `v0.2.0-prototype` 并推送。
 
+### POLISH-060 HUD 状态反馈打磨（低风险）
+
+- 状态：完成
+- 风险等级：低风险
+- 低风险原因：只打磨已有 HUD 状态表达，不新增系统、不修改核心规则、数值、敌袭触发、推进器判定或胜败条件。
+- 制作人方向：v0.2.0-prototype 发布后，先做低风险反馈打磨，让玩家更清楚当前目标、敌袭阶段、推进器是否生效。
+- 负责人建议：`game-polish-developer`
+- 允许修改范围：`Game/src/main.js` 中 HUD 绘制、状态文案、提示文本、只读状态展示相关的最小代码范围；如 L2 自动化因 HUD 文案/指纹变化需要同步，可最小更新 `Scripts/verify-gameplay-smoke.mjs`。
+- 禁止修改范围：不新增系统、按钮、教程流程、任务系统、倒计时或新 UI 面板；不修改核心规则、敌袭触发阈值、推进器生效逻辑、资源产消、数值、胜败条件、敌人/炮塔行为；不修改 `Releases/`、`Guard/`、`.cursor/`、历史发布产物；不引入新依赖。
+- 验收标准：
+  - HUD 能明确表达当前目标，例如建设/采矿/敌袭/结算前后的下一步提示。
+  - HUD 能明确表达敌袭阶段：安全建设期、预警期、已触发期状态可区分。
+  - HUD 能明确表达推进器状态：未建造、已建造但未生效、已生效并提升速度。
+  - 所有改动只影响展示与提示，不改变玩法结果。
+  - L0 必须通过：`pwsh -NoProfile -ExecutionPolicy Bypass -File Scripts/validate-static.ps1`。
+  - L2 必须通过：`pwsh -NoProfile -ExecutionPolicy Bypass -File Scripts/verify-gameplay-smoke.ps1`。
+  - L2.5 默认不强制；若触碰结算 overlay、胜败状态机、重开逻辑或共享 HUD/overlay 状态，则必须补跑。
+  - ReadLints 无新增问题。
+- 执行结果（2026-05-23）：
+  - `game-polish-developer` 已完成 `Game/src/main.js` HUD 反馈打磨：新增敌袭阶段、推进器状态、当前建议三类只读展示；保持金属、电力、核心、敌袭、模块、速度等关键 HUD 行位不变。
+  - 敌袭文案从单一状态改为安全期、预警中、来袭中；推进器文案区分未建造、生效中、停电；HUD 下方新增“当前建议”。
+  - `game-code-god` 专项审核：通过，无玩法规则越界；确认未修改敌袭阈值、推进器生效逻辑、资源产消、数值、胜败条件、敌人/炮塔行为或发布归档。
+  - 主 agent 复核验证：L0 `SUMMARY: PASS (6 checks, 586 ms)`；L2 `SUMMARY: PASS (15 checks, 34614 ms)`；ReadLints 无新增问题。
+  - L2.5：本轮未触碰结算 overlay、胜败状态机或重开逻辑，按计划不强制执行。
+  - `git diff --check`：对 `Game/src/main.js` 与本看板新增 CRLF 行继续报告 trailing whitespace；`git ls-files --eol` 显示两文件均为 `i/crlf w/crlf`，本轮保留既有行尾风格以避免无关格式化。
+- 残留风险：HUD 文案更清楚不等于体验节奏更好，仍需制作人实机判断玩家是否真的理解目标；当前自动化仍依赖 Edge headless、固定视口和 Canvas 像素/HUD 指纹。
+
 ## 历史轮次
 
 串行：ENG-001 → ENG-002 → GAME-001 → GAME-002 + GAME-003 + PHYS-001（阶段 A）
