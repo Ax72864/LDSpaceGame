@@ -10,7 +10,23 @@ From the repo root in PowerShell:
 pwsh -NoProfile -ExecutionPolicy Bypass -File Scripts/validate-static.ps1
 ```
 
-Expect `SUMMARY: PASS`. For browser smoke steps after code changes, see [Docs/smoke-checklist.md](Docs/smoke-checklist.md).
+Expect `SUMMARY: PASS`.
+
+### Console smoke (L0.5, automated)
+
+Captures Console errors and runtime exceptions via Edge headless + CDP (no npm install):
+
+```powershell
+pwsh -NoProfile -ExecutionPolicy Bypass -File Scripts/verify-browser-console.ps1
+```
+
+Or directly:
+
+```powershell
+node Scripts/verify-browser-console.mjs
+```
+
+Expect output to include the local URL, Edge path, zero console errors, and `SUMMARY: PASS`. This does not replace full interaction checks; after `Game/` changes, also follow [Docs/smoke-checklist.md](Docs/smoke-checklist.md).
 
 Run locally from PowerShell:
 

@@ -7,8 +7,9 @@
 ## 前置条件
 
 - 已完成 L0：`pwsh -NoProfile -ExecutionPolicy Bypass -File Scripts/validate-static.ps1` 输出 `SUMMARY: PASS`。
+- 建议再跑 L0.5 Console 自动化：`pwsh -NoProfile -ExecutionPolicy Bypass -File Scripts/verify-browser-console.ps1`（或 `node Scripts/verify-browser-console.mjs`）。脚本会临时启动 Python HTTP 服务与 Edge headless，采集 **Console error / Runtime exception**、页面加载与 `#game` Canvas 是否存在；通过时输出 `SUMMARY: PASS`。**不覆盖**移动、建造、敌袭等交互，那些仍须按下方人工步骤执行。
 - 本机可用浏览器（Edge / Chrome 等）。
-- 任选一种本地静态服务方式（二选一即可）。
+- 任选一种本地静态服务方式（二选一即可；人工冒烟时使用；L0.5 脚本会自行起服务）。
 
 ## 启动本地服务
 
@@ -72,6 +73,7 @@ npx serve Game
 |------|------|
 | 日期 / 执行人 | |
 | L0 结果 | PASS / FAIL |
+| L0.5 Console 脚本 | PASS / FAIL / 跳过 |
 | 服务方式 | python 8080 / npx serve / 其他 |
 | 浏览器 | |
 | 失败步骤编号 | |

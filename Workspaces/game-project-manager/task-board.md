@@ -235,6 +235,21 @@ GAME-004 已交付（`Game/src/main.js`）。下一步：制作人实机体验�
 - 反馈来源：L0 PowerShell 输出、Python HTTP 探测、Edge headless 截屏可用性探测、工具开发自检报告。
 - 残留风险：静态与 HTTP serving 已验证，运行时交互、Canvas 实际观感和 Console 错误仍未闭环；下一步需人工按 `Docs/smoke-checklist.md` 跑完整 L1，或评估 Playwright 最小试点。
 
+### SMOKE-002 Edge Headless Console 冒烟（2026-05-23）
+
+- 状态：完成
+- 风险等级：低风险工具任务
+- 负责人：`game-tools-developer`
+- 目标：建立零 npm 依赖的 L0.5 浏览器 Console 自动化冒烟，采集页面加载、`#game` Canvas、Console error 和 Runtime exception。
+- 允许范围：`Scripts/verify-browser-console.mjs`、`Scripts/verify-browser-console.ps1`、`README.md`、`Docs/smoke-checklist.md`、本看板记录。
+- 禁止范围：不修改 `Game/` 玩法代码；不修改发布归档；不提交 `Guard/logs/daemon.log`、空 `agent`、截图录像或临时测试产物。
+- 验证结果：
+  - L0：`SUMMARY: PASS (6 checks, 102 ms)`。
+  - L0.5：`SUMMARY: PASS (4 checks, 3724 ms)`；Console 0 errors；Runtime exceptions 0。
+  - ReadLints：无新增问题。
+- 反馈来源：PowerShell 静态验证、Edge headless + CDP 自动化输出、PM 提交前只读审核。
+- 残留风险：L0.5 不覆盖移动、建造、采矿、敌袭、胜败、重开等交互；后续 `Game/` 改动仍需按 `Docs/smoke-checklist.md` 执行 L1，重复路径再评估 L2 自动化。
+
 ## 历史轮次
 
 串行：ENG-001 → ENG-002 → GAME-001 → GAME-002 + GAME-003 + PHYS-001（阶段 A）
