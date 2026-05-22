@@ -25,6 +25,8 @@ const ENEMY_HP = 20;
 const ENEMY_SPEED = 28;
 const ENEMY_CONTACT_RADIUS = 34;
 const ENEMY_CORE_DPS = 5;
+const CORE_DANGER_RADIUS = ENEMY_CONTACT_RADIUS + 24;
+const CORE_DANGER_HP_THRESHOLD = CORE_MAX_HP * 0.35;
 const PROJECTILE_TTL = 0.16;
 const RESTART_BUTTON = { x: 32, y: 220, width: 92, height: 32 };
 
@@ -225,6 +227,9 @@ function getHudSuggestionText() {
   if (state.gameOver === "defeat") {
     return "当前建议: 核心失守，优先补炮塔与电力冗余。";
   }
+  if (isCoreInDanger()) {
+    return "当前建议: 警告: 核心危险，拉开敌人并保护核心。";
+  }
   if (state.stageAComplete && !state.waveStarted) {
     return "当前建议: 阶段达成，扩建炮塔并准备迎敌。";
   }
@@ -235,6 +240,19 @@ function getHudSuggestionText() {
     return "当前建议: 预警阶段，尽快补齐第4设施前的防御。";
   }
   return "当前建议: 先扩到5结构并靠近目标圈，完成阶段A。";
+}
+
+function isCoreInDanger() {
+  if (state.coreHp <= CORE_DANGER_HP_THRESHOLD) {
+    return true;
+  }
+  for (const enemy of state.enemies) {
+    const distance = Math.hypot(state.station.x - enemy.x, state.station.y - enemy.y);
+    if (distance <= CORE_DANGER_RADIUS) {
+      return true;
+    }
+  }
+  return false;
 }
 
 function getObjectiveDistance() {
@@ -560,6 +578,13 @@ function drawModule(module) {
   const screen = worldToScreen(world.x, world.y);
 
   if (module.type === "core") {
+    if (isCoreInDanger()) {
+      ctx.strokeStyle = "rgba(255, 107, 107, 0.95)";
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.arc(screen.x, screen.y, CELL_SIZE * 0.56, 0, Math.PI * 2);
+      ctx.stroke();
+    }
     ctx.fillStyle = "#49a7ff";
     ctx.beginPath();
     ctx.arc(screen.x, screen.y, CELL_SIZE * 0.42, 0, Math.PI * 2);
@@ -573,6 +598,15 @@ function drawModule(module) {
     ctx.fillStyle = module.active ? "#45d66f" : "#306d42";
   } else if (module.type === "turret") {
     ctx.fillStyle = module.active ? "#e64d54" : "#7d3338";
+    if (state.facilityCount >= 2 || state.waveStarted) {
+      ctx.strokeStyle = module.active ? "rgba(255, 211, 106, 0.66)" : "rgba(94, 101, 112, 0.76)";
+      ctx.lineWidth = 2;
+      ctx.setLineDash([7, 6]);
+      ctx.beginPath();
+      ctx.arc(screen.x, screen.y, TURRET_RANGE, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
   } else if (module.type === "thruster") {
     ctx.fillStyle = module.active ? "#7f7cff" : "#3f3c78";
   } else {
@@ -655,6 +689,22 @@ function drawMoveTarget() {
 function drawEnemies() {
   for (const enemy of state.enemies) {
     const screen = worldToScreen(enemy.x, enemy.y);
+    const awayX = enemy.x - state.station.x;
+    const awayY = enemy.y - state.station.y;
+    const awayDistance = Math.hypot(awayX, awayY);
+    if (awayDistance > 0.001) {
+      const nx = awayX / awayDistance;
+      const ny = awayY / awayDistance;
+      ctx.strokeStyle = "rgba(255, 140, 58, 0.58)";
+      ctx.lineWidth = 5;
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(screen.x + nx * 10, screen.y + ny * 10);
+      ctx.lineTo(screen.x + nx * 30, screen.y + ny * 30);
+      ctx.stroke();
+      ctx.lineCap = "butt";
+    }
+
     ctx.fillStyle = "#ff8c3a";
     ctx.beginPath();
     ctx.arc(screen.x, screen.y, 14, 0, Math.PI * 2);

@@ -405,6 +405,36 @@ GAME-004 已交付（`Game/src/main.js`）。下一步：制作人实机体验�
   - `git diff --check`：对 `Game/src/main.js` 与本看板新增 CRLF 行继续报告 trailing whitespace；`git ls-files --eol` 显示两文件均为 `i/crlf w/crlf`，本轮保留既有行尾风格以避免无关格式化。
 - 残留风险：HUD 文案更清楚不等于体验节奏更好，仍需制作人实机判断玩家是否真的理解目标；当前自动化仍依赖 Edge headless、固定视口和 Canvas 像素/HUD 指纹。
 
+### POLISH-070 战斗威胁反馈打磨（低风险）
+
+- 状态：完成
+- 风险等级：低风险
+- 低风险原因：只打磨已有战斗威胁的表现反馈和只读状态展示，不新增系统、不修改核心规则、不改任何数值与触发条件。
+- 制作人方向：低风险打磨战斗反馈，让玩家更清楚敌人来向、核心危险、炮塔防守窗口。
+- 负责人建议：`game-polish-developer`
+- 审核建议：`game-code-god` 只读审核表现边界与禁止范围；PM 汇总验证结果。
+- 允许修改范围：优先限定在 `Game/src/main.js` 内纯表现/只读状态展示相关的最小代码范围；可调整敌人来向提示、敌人可见性强调、核心危险提示、炮塔防守窗口提示、HUD 战斗建议文案、颜色/描边/短线/范围提示等表现层内容；如 L2 自动化因 HUD 文案、Canvas 指纹或表现变化失败，可最小同步更新 `Scripts/verify-gameplay-smoke.mjs`；可在看板记录执行结果、验证结果和残留风险。
+- 禁止修改范围：不改敌人速度、HP、数量、伤害；不改炮塔 DPS、范围、冷却、电力优先级或攻击判定；不改胜败条件、敌袭触发规则、资源产消、建造成本、推进器规则；不新增敌人类型、波次系统、倒计时系统、任务系统、新按钮、新 UI 面板或新依赖；不修改 `Releases/` 发布归档、`Guard/`、`.cursor/`、历史发布产物；不提交 `Guard/logs/daemon.log`、空 `agent`、截图录像临时产物或无关文件。
+- 验收标准：
+  - 敌人来向更清楚：敌袭中玩家能从画面或 HUD 明确判断敌人正在从哪里逼近核心。
+  - 核心危险更清楚：核心 HP 偏低、敌人接近或接触核心时，有明显但不遮挡操作的危险反馈。
+  - 炮塔防守窗口更清楚：玩家能理解炮塔覆盖/接敌窗口，知道敌人何时进入或接近防守范围。
+  - 所有改动只影响表现、提示和只读状态展示，不改变任何玩法结果。
+  - L0 必须通过：`pwsh -NoProfile -ExecutionPolicy Bypass -File Scripts/validate-static.ps1`。
+  - L2 必须通过：`pwsh -NoProfile -ExecutionPolicy Bypass -File Scripts/verify-gameplay-smoke.ps1`。
+  - L2.5 默认不需要；若触碰结算 overlay、胜败状态机、重开逻辑、核心 HP 结算判断、敌人死亡/清空判断，或导致 L2 无法覆盖关键风险，则必须补跑。
+  - ReadLints 无新增问题。
+  - 专项审核确认没有越界修改禁止范围。
+- 残留风险：表现更明显可能增加 HUD/Canvas 视觉噪音；自动化能证明流程未破坏，但不能完全证明玩家理解提升。
+- 执行结果（2026-05-23）：
+  - `game-polish-developer` 已完成 `Game/src/main.js` 战斗威胁反馈打磨：新增核心危险只读判断、核心危险环、敌人方向尾迹、炮塔射程虚线圈，并在核心危险时优先显示 HUD 建议。
+  - 所有新增内容均为表现层或只读状态展示；未修改敌人速度/HP/数量/伤害、炮塔 DPS/范围/冷却/电力优先级/攻击判定、胜败条件、敌袭触发规则、资源产消、建造成本或推进器规则。
+  - `game-code-god` 专项审核：通过，无代码层必须修复项；提交前继续排除 `Guard/logs/daemon.log` 与空 `agent`。
+  - 主 agent 复核验证：L0 `SUMMARY: PASS (6 checks, 14547 ms)`；L2 `SUMMARY: PASS (15 checks, 47386 ms)`；ReadLints 无新增问题。
+  - L2.5：本轮未触碰结算 overlay、胜败状态机、重开逻辑、核心 HP 结算判断或敌人死亡/清空判断，按计划不强制执行。
+  - `git diff --check`：对 `Game/src/main.js` 与本看板新增 CRLF 行继续报告 trailing whitespace；`git ls-files --eol` 显示两文件均为 `i/crlf w/crlf`，本轮保留既有行尾风格以避免无关格式化。
+- 制作人终验决定：通过。接受“炮塔范围圈和敌人尾迹可能增加画面信息量、仍缺人工体感确认”的残留风险，先让战斗威胁可读性进入主线。
+
 ## 历史轮次
 
 串行：ENG-001 → ENG-002 → GAME-001 → GAME-002 + GAME-003 + PHYS-001（阶段 A）
