@@ -3,6 +3,8 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false)
+$OutputEncoding = [Console]::OutputEncoding
 
 function Get-IsoNow {
     return (Get-Date).ToUniversalTime().ToString("o")
@@ -108,7 +110,10 @@ function Invoke-AgentRound {
     param(
         [string]$CursorCommand,
         [string[]]$Arguments,
-        [string]$MainLog
+        [string]$MainLog,
+        [string]$WorkingDirectory,
+        [string]$StatePath,
+        [int]$MaxRoundSeconds
     )
 
     $displayArgs = @($Arguments | ForEach-Object {
@@ -121,15 +126,41 @@ function Invoke-AgentRound {
     })
     Write-Log -Path $MainLog -Message ("Starting Cursor CLI round: {0} {1}" -f $CursorCommand, ($displayArgs -join " "))
 
-    & $CursorCommand @Arguments 2>&1 | ForEach-Object {
-        Add-Content -LiteralPath $MainLog -Value ([string]$_) -Encoding UTF8
+    $roundId = [guid]::NewGuid().ToString("N")
+    $stdoutPath = Join-Path ([System.IO.Path]::GetTempPath()) ("ldspace-cursor-agent-{0}.out.log" -f $roundId)
+    $stderrPath = Join-Path ([System.IO.Path]::GetTempPath()) ("ldspace-cursor-agent-{0}.err.log" -f $roundId)
+
+    $process = Start-Process -FilePath $CursorCommand -ArgumentList $Arguments -WorkingDirectory $WorkingDirectory -RedirectStandardOutput $stdoutPath -RedirectStandardError $stderrPath -PassThru
+    Update-State -StatePath $StatePath -Patch @{
+        activeAgentPid = $process.Id
     }
 
-    if ($null -eq $global:LASTEXITCODE) {
-        return 0
+    $finished = $process.WaitForExit($MaxRoundSeconds * 1000)
+    if (-not $finished) {
+        Write-Log -Path $MainLog -Message ("Cursor CLI round timed out after {0} seconds; killing pid={1}." -f $MaxRoundSeconds, $process.Id)
+        & taskkill.exe /PID $process.Id /T /F 2>&1 | ForEach-Object {
+            Add-Content -LiteralPath $MainLog -Value ([string]$_) -Encoding UTF8
+        }
+        Update-State -StatePath $StatePath -Patch @{
+            activeAgentPid = $null
+        }
+        return 124
     }
 
-    return [int]$global:LASTEXITCODE
+    foreach ($path in @($stdoutPath, $stderrPath)) {
+        if (Test-Path -LiteralPath $path) {
+            Get-Content -LiteralPath $path -Encoding UTF8 | ForEach-Object {
+                Add-Content -LiteralPath $MainLog -Value ([string]$_) -Encoding UTF8
+            }
+            Remove-Item -LiteralPath $path -Force
+        }
+    }
+
+    Update-State -StatePath $StatePath -Patch @{
+        activeAgentPid = $null
+    }
+
+    return [int]$process.ExitCode
 }
 
 function Test-AgentAuthentication {
@@ -207,7 +238,7 @@ try {
             activeAgentPid = $null
         }
 
-        $exitCode = Invoke-AgentRound -CursorCommand $cursorCommand -Arguments $args -MainLog $mainLog
+        $exitCode = Invoke-AgentRound -CursorCommand $cursorCommand -Arguments $args -MainLog $mainLog -WorkingDirectory $repoRoot -StatePath $statePath -MaxRoundSeconds ([int]$config.maxRoundSeconds)
         Update-State -StatePath $statePath -Patch @{
             lastHeartbeatAt = Get-IsoNow
             lastExitCode = $exitCode

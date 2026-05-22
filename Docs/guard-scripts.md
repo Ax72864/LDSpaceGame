@@ -83,8 +83,11 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\Guard\start-game-dev.ps1
 守护脚本每 30 秒检查一次主脚本 PID：
 
 - 如果主脚本意外退出，且状态不是 `disabled`，守护脚本会自动重启。
+- 如果主脚本心跳超过 `Guard/config.json` 中的 `staleHeartbeatSeconds` 未更新，守护脚本会认为主开发回合卡住并重启主脚本。
 - 如果通过 `cmd.txt` 下达停止命令，守护脚本会先尝试优雅停止，超时后结束主脚本进程树，并进入 `disabled` 状态。
 - 进入 `disabled` 后不会自动重启，直到收到启动命令。
+
+单轮 Cursor Agent 调用最长运行时间由 `maxRoundSeconds` 控制。超过该时间后，启动脚本会结束本轮 agent 进程树并进入下一轮，避免卡死后只执行一轮。
 
 ## Guard 同步
 

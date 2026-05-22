@@ -17,7 +17,9 @@
     "{prompt}"
   ],
   "mainLoopDelaySeconds": 15,
+  "maxRoundSeconds": 1800,
   "daemonPollSeconds": 30,
+  "staleHeartbeatSeconds": 2400,
   "gitSyncSeconds": 300,
   "restartDelaySeconds": 10,
   "stopTimeoutSeconds": 30,

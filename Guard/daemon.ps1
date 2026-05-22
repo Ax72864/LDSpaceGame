@@ -4,6 +4,8 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false)
+$OutputEncoding = [Console]::OutputEncoding
 
 function Get-IsoNow {
     return (Get-Date).ToUniversalTime().ToString("o")
@@ -289,6 +291,17 @@ function Invoke-GitSync {
     }
 }
 
+function Read-CommandList {
+    param([string]$Path)
+
+    $json = Get-Content -LiteralPath $Path -Raw -Encoding UTF8 | ConvertFrom-Json
+    $commands = New-Object System.Collections.Generic.List[object]
+    foreach ($item in $json) {
+        $commands.Add($item)
+    }
+    return $commands.ToArray()
+}
+
 function Resolve-AgentArguments {
     param(
         [object[]]$TemplateArgs,
@@ -473,13 +486,24 @@ $lastSync = [DateTime]::MinValue
 while ($true) {
     try {
         $config = Read-JsonFile $configPath
-        $commands = @(Read-JsonFile $commandsPath)
+        $commands = @(Read-CommandList $commandsPath)
 
         Process-CmdFile -Config $config -RepoRoot $repoRoot -StatePath $statePath -PidPath $pidPath -CmdPath $cmdPath -HistoryPath $historyPath -DaemonLog $daemonLog -Commands $commands
 
         $desired = Get-StateValue -StatePath $statePath -Name "desiredState"
         $mainPid = Get-MainPid -PidPath $pidPath -StatePath $statePath
-        if ($desired -ne "disabled" -and -not (Test-ProcessAlive -ProcessId $mainPid)) {
+        $lastHeartbeat = Get-StateValue -StatePath $statePath -Name "lastHeartbeatAt"
+        $heartbeatStale = $false
+        if ($lastHeartbeat) {
+            $heartbeatAge = ((Get-Date).ToUniversalTime() - [DateTime]::Parse([string]$lastHeartbeat).ToUniversalTime()).TotalSeconds
+            $heartbeatStale = ($heartbeatAge -gt [int]$config.staleHeartbeatSeconds)
+        }
+        if ($desired -ne "disabled" -and ((-not (Test-ProcessAlive -ProcessId $mainPid)) -or $heartbeatStale)) {
+            if ($heartbeatStale) {
+                Write-Log -Path $daemonLog -Message ("Main heartbeat is stale; restarting. lastHeartbeatAt={0}" -f $lastHeartbeat)
+                $null = Stop-MainScript -RepoRoot $repoRoot -StatePath $statePath -PidPath $pidPath -DaemonLog $daemonLog -TimeoutSeconds ([int]$config.stopTimeoutSeconds)
+                Update-State -StatePath $statePath -Patch @{ desiredState = "running" }
+            }
             Write-Log -Path $daemonLog -Message "Main script is not running; restarting."
             $restartCount = Get-StateValue -StatePath $statePath -Name "restartCount"
             if ($null -eq $restartCount) {
