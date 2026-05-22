@@ -692,7 +692,9 @@ function drawHud() {
     ctx.fillText("阶段 A 能力达成", 150, 242);
   }
 
-  drawRestartButton();
+  if (!state.gameOver) {
+    drawRestartButton();
+  }
 }
 
 function drawOverlay() {
