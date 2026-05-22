@@ -1,0 +1,20 @@
+# Local dependencies
+node_modules/
+
+# Browser and Playwright test artifacts
+Artifacts/
+playwright-report/
+test-results/
+blob-report/
+.playwright/
+
+# Guard runtime outputs
+# Already tracked Guard files still require commit-time review.
+Guard/*.pid
+Guard/cmd.txt
+Guard/logs/*.log
+
+# OS/editor noise
+Thumbs.db
+Desktop.ini
+.vscode/

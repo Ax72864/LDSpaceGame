@@ -191,6 +191,16 @@ function getFrameCount() {
   return count;
 }
 
+function getRaidStatusText(waveStarted = state.waveStarted, facilityCount = state.facilityCount) {
+  if (waveStarted) {
+    return "已触发";
+  }
+  if (facilityCount >= 2) {
+    return "预警中 / 建造第4个设施触发";
+  }
+  return "建造第2个设施后预警";
+}
+
 function getObjectiveDistance() {
   return Math.hypot(
     state.objectiveTarget.x - state.station.x,
@@ -235,8 +245,8 @@ function buildFacility(type) {
   state.facilityCount += 1;
   clearBuildSelection();
 
-  // GAME-004 prototype trigger: starting the raid on the second facility makes the loop fast to test.
-  if (!state.waveStarted && state.facilityCount >= 2) {
+  // RAID-040 prototype pacing: warn on the second facility, spawn on the fourth.
+  if (!state.waveStarted && state.facilityCount >= 4) {
     spawnEnemyWave();
   }
   return true;
@@ -669,6 +679,7 @@ function drawHud() {
   const objectiveDistance = getObjectiveDistance();
   const speed = BASE_SPEED * (hasThruster() ? THRUSTER_SPEED_MULTIPLIER : 1);
   const livingEnemies = state.enemies.length;
+  const raidStatus = getRaidStatusText();
 
   ctx.fillStyle = "rgba(2, 8, 18, 0.72)";
   ctx.fillRect(16, 16, 470, 250);
@@ -681,7 +692,7 @@ function drawHud() {
   );
   ctx.fillText(`电力: +${state.powerProduced} / -${state.powerUsed}`, 32, 68);
   ctx.fillText(`核心HP: ${Math.ceil(state.coreHp)} / ${CORE_MAX_HP}`, 32, 92);
-  ctx.fillText(`敌人: ${livingEnemies} / ${ENEMY_COUNT}  敌袭: ${state.waveStarted ? "已触发" : "建造第2个设施触发"}`, 32, 116);
+  ctx.fillText(`敌人: ${livingEnemies} / ${ENEMY_COUNT}  敌袭: ${raidStatus}`, 32, 116);
   ctx.fillText(`模块: ${moduleCount}  结构: ${frameCount}/5  目标距离: ${objectiveDistance.toFixed(0)}`, 32, 140);
   ctx.fillText(`速度: ${speed.toFixed(0)} world/s  推进器: ${hasThruster() ? "在线" : "无/停电"}  采矿半径: ${MINING_RADIUS}`, 32, 164);
   ctx.fillText("操作: 点击绿色邻格建框架；点击frame开菜单；设施含采矿/炮塔/推进器。", 32, 188);

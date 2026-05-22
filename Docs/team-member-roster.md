@@ -24,6 +24,7 @@
 - 软件安装、环境配置、系统维护：交给 `/it-engineer`。
 - 审核任务应优先选择更资深、职责更匹配的成员，避免让执行者自审。
 - 版本规划、多步骤任务、跨职能任务和发布任务必须让 `/game-project-manager` 介入。
+- 涉及可玩内容时，任务拆分和审核必须关注验证计划、浏览器运行反馈、日志、自动化测试和残留风险。
 - 除涉及本机环境的危险操作外，其余项目事项默认由 `/space-game-producer` 拥有决定权。
 - 核心玩法、系统规则、数值框架和存档数据属于项目高风险任务，应走专项审核、PM 汇总审核和制作人最终决定。
 - 环境配置、权限提升、删除覆盖类操作属于本机环境危险操作，必须先获得用户确认。
@@ -50,7 +51,7 @@
 | 代码之神 | `/game-code-god` | 资深游戏开发者，擅长拆解、复刻和工程落地 | 技术拆解、复刻方案、架构评审、代码实现、性能分析和疑难问题攻关 | 可执行开发 |
 | 产品打磨开发者 | `/game-polish-developer` | 独立制作过多款游戏，擅长反复 polish | 手感优化、细节修正、稳定性提升、代码质量打磨和 Bug 修复 | 可执行开发 |
 | 游戏客户端开发者 | `/game-client-developer` | 聪明可靠、善于学习的一线客户端开发者 | Unity 玩法逻辑、输入反馈、UI 交互、场景对象和基础 Bug 修复 | 可执行开发 |
-| 游戏工具开发者 | `/game-tools-developer` | 聪明可靠、善于学习的工具与管线开发者 | Unity 编辑器工具、资源流程、自动化脚本、数据检查和配置生成 | 可执行开发 |
+| 游戏工具开发者 | `/game-tools-developer` | 聪明可靠、善于学习的工具与管线开发者 | Unity 编辑器工具、资源流程、Playwright/浏览器自动化、日志采集、数据检查和配置生成 | 可执行开发 |
 | 游戏原型开发者 | `/game-prototype-developer` | 动手快、善于串联功能的原型与整合开发者 | 快速原型、功能串联、临时验证、玩法实验和小范围技术验证 | 可执行开发 |
 
 ## 美术团队
@@ -80,6 +81,8 @@
 - 快速验证新玩法：`/game-prototype-developer` 执行，`/space-game-producer` 或 `/game-system-designer` 审核体验。
 - 实现正式玩法功能：`/game-client-developer` 执行，复杂技术由 `/game-code-god` 评审或攻关。
 - 打磨已有操控手感：`/game-polish-developer` 执行，制作人或系统策划确认体验目标。
+- 建立浏览器冒烟、Playwright 回归、日志采集或发布验证脚本：`/game-tools-developer` 执行，PM 审核验证闭环。
+- 判断是否引入 Phaser、PixiJS、Unity WebGL、Vite、ESLint 等工具链：制作人提出体验与效率问题，PM 统筹成本风险，`/game-tools-developer` 或 `/it-engineer` 做技术评估。
 - 制作 UI mockup 或图标：`/game-ui-artist` 执行，`/game-art-director` 审核风格一致性。
 - 生成舰船、道具或场景资产方案：`/game-asset-artist` 执行，`/game-art-director` 审核整体风格。
 - 安装 Unity、Blender、SDK 或外部工具：`/it-engineer` 先检查环境和风险，再执行安装配置。
