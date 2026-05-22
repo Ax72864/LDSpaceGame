@@ -217,3 +217,8 @@
 [2026-05-22T02:02:04.7976171Z] [main 8d22497] Update Guard status
 [2026-05-22T02:02:04.7976171Z]  2 files changed, 5 insertions(+), 2 deletions(-)
 [2026-05-22T02:02:12.4703206Z] Already up to date.
+[2026-05-22T02:03:47.4890510Z] Guard daemon started. PID=82104, Workspace=D:\work\spacegame\LDSpaceGame
+[2026-05-22T02:03:47.5443069Z] Main heartbeat is stale; restarting. lastHeartbeatAt=2026-05-21T21:05:03.0271014Z
+[2026-05-22T02:03:47.5640156Z] Stopping main script pid=71448
+[2026-05-22T02:04:18.2514792Z] Graceful stop timed out; killing process tree pid=71448
+[2026-05-22T02:04:18.7371594Z] Main script is not running; restarting.
