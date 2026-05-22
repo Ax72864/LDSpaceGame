@@ -8,6 +8,8 @@ const CORE_POWER_OUTPUT = 10;
 const CORE_MAX_HP = 100;
 const BASE_SPEED = 42;
 const THRUSTER_SPEED_MULTIPLIER = 1.5;
+const THRUSTER_COST = 20;
+const THRUSTER_POWER = 2;
 const OBJECTIVE_RADIUS = 80;
 const MINING_COST = 25;
 const MINING_POWER = 4;
@@ -35,6 +37,7 @@ const ASTEROIDS = [
 const BUILD_OPTIONS = [
   { type: "mining", label: "采矿站", cost: MINING_COST },
   { type: "turret", label: "炮塔", cost: TURRET_COST },
+  { type: "thruster", label: "推进器", cost: THRUSTER_COST },
 ];
 
 function createInitialState() {
@@ -125,7 +128,7 @@ function isBuildableFrameSlot(gx, gy) {
 
 function hasThruster() {
   for (const module of state.station.modules.values()) {
-    if (module.type === "thruster") {
+    if (module.type === "thruster" && module.active) {
       return true;
     }
   }
@@ -176,7 +179,12 @@ function updateStation(dt) {
 function getFrameCount() {
   let count = 0;
   for (const module of state.station.modules.values()) {
-    if (module.type === "frame" || module.type === "mining" || module.type === "turret") {
+    if (
+      module.type === "frame" ||
+      module.type === "mining" ||
+      module.type === "turret" ||
+      module.type === "thruster"
+    ) {
       count += 1;
     }
   }
@@ -205,6 +213,9 @@ function getFacilityCost(type) {
   }
   if (type === "turret") {
     return TURRET_COST;
+  }
+  if (type === "thruster") {
+    return THRUSTER_COST;
   }
   return Infinity;
 }
@@ -277,20 +288,28 @@ function updatePowerAllocation() {
   let remainingPower = state.powerProduced;
   let usedPower = 0;
   const turrets = [];
+  const thrusters = [];
   const miningStations = [];
 
   for (const module of state.station.modules.values()) {
     module.active = module.type === "core" || module.type === "frame";
     if (module.type === "turret") {
       turrets.push(module);
+    } else if (module.type === "thruster") {
+      thrusters.push(module);
     } else if (module.type === "mining") {
       miningStations.push(module);
     }
   }
 
-  // Power shortage rule: turrets are kept online before mining stations.
-  for (const module of [...turrets, ...miningStations]) {
-    const need = module.type === "turret" ? TURRET_POWER : MINING_POWER;
+  // Power shortage rule: turrets stay online before thrusters, then mining stations.
+  for (const module of [...turrets, ...thrusters, ...miningStations]) {
+    let need = MINING_POWER;
+    if (module.type === "turret") {
+      need = TURRET_POWER;
+    } else if (module.type === "thruster") {
+      need = THRUSTER_POWER;
+    }
     module.active = remainingPower >= need;
     if (module.active) {
       remainingPower -= need;
@@ -508,6 +527,8 @@ function drawModule(module) {
     ctx.fillStyle = module.active ? "#45d66f" : "#306d42";
   } else if (module.type === "turret") {
     ctx.fillStyle = module.active ? "#e64d54" : "#7d3338";
+  } else if (module.type === "thruster") {
+    ctx.fillStyle = module.active ? "#7f7cff" : "#3f3c78";
   } else {
     ctx.fillStyle = "#a8b0bd";
   }
@@ -527,7 +548,19 @@ function drawModule(module) {
     CELL_SIZE * 0.72,
   );
 
-  if (!module.active && (module.type === "mining" || module.type === "turret")) {
+  if (module.type === "thruster") {
+    ctx.fillStyle = module.active ? "#cfd2ff" : "#7779aa";
+    ctx.beginPath();
+    ctx.moveTo(screen.x - 12, screen.y - 14);
+    ctx.lineTo(screen.x + 14, screen.y);
+    ctx.lineTo(screen.x - 12, screen.y + 14);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = module.active ? "#ffcf5a" : "#8a6f38";
+    ctx.fillRect(screen.x - 20, screen.y - 8, 8, 16);
+  }
+
+  if (!module.active && (module.type === "mining" || module.type === "turret" || module.type === "thruster")) {
     ctx.fillStyle = "#ffd36a";
     ctx.font = "12px Segoe UI, Arial, sans-serif";
     ctx.fillText("停电", screen.x - 14, screen.y + 4);
@@ -641,13 +674,17 @@ function drawHud() {
   ctx.fillRect(16, 16, 470, 250);
   ctx.fillStyle = "#d9f3ff";
   ctx.font = "15px Segoe UI, Arial, sans-serif";
-  ctx.fillText(`金属: ${Math.floor(state.metal)}  (框架${FRAME_COST}/采矿${MINING_COST}/炮塔${TURRET_COST})`, 32, 44);
+  ctx.fillText(
+    `金属: ${Math.floor(state.metal)}  (框架${FRAME_COST}/采矿${MINING_COST}/炮塔${TURRET_COST}/推进${THRUSTER_COST})`,
+    32,
+    44,
+  );
   ctx.fillText(`电力: +${state.powerProduced} / -${state.powerUsed}`, 32, 68);
   ctx.fillText(`核心HP: ${Math.ceil(state.coreHp)} / ${CORE_MAX_HP}`, 32, 92);
   ctx.fillText(`敌人: ${livingEnemies} / ${ENEMY_COUNT}  敌袭: ${state.waveStarted ? "已触发" : "建造第2个设施触发"}`, 32, 116);
   ctx.fillText(`模块: ${moduleCount}  结构: ${frameCount}/5  目标距离: ${objectiveDistance.toFixed(0)}`, 32, 140);
-  ctx.fillText(`速度: ${speed.toFixed(0)} world/s  采矿半径: ${MINING_RADIUS}`, 32, 164);
-  ctx.fillText("操作: 点击绿色邻格建框架；点击frame开菜单；设施选项点两次确认。", 32, 188);
+  ctx.fillText(`速度: ${speed.toFixed(0)} world/s  推进器: ${hasThruster() ? "在线" : "无/停电"}  采矿半径: ${MINING_RADIUS}`, 32, 164);
+  ctx.fillText("操作: 点击绿色邻格建框架；点击frame开菜单；设施含采矿/炮塔/推进器。", 32, 188);
 
   if (state.stageAComplete) {
     ctx.fillStyle = "#5bffb4";
